@@ -5,21 +5,38 @@ class ConsoleApp
 {
   static void Main(string[] args)
   {
-    using var imagesFromFile = new MagickImageCollection("1RtT7h3L.png");
+    //using var imagesFromFile = new MagickImageCollection("1RtT7h3L.png");
     //using var imagesFromFile = new MagickImageCollection("EKD3bBZP.png");
     //using var imagesFromFile = new MagickImageCollection("bmDwolWU.png");
     //using var imagesFromFile = new MagickImageCollection("MBlXyTSp.png"); //cat
-    //using var imagesFromFile = new MagickImageCollection("mCeETXDs.png"); //butterfly
+    using var imagesFromFile = new MagickImageCollection("mCeETXDs.png"); //butterfly
     foreach (var image in imagesFromFile)
     {
       var pixels = image.GetPixels();
 
-      var offset = GetHeaderOffset(image.Width, image.Height, pixels);
-      var length = GetLength(image.Width, offset, pixels);
-      Console.WriteLine($"{length}");
+      uint offset = 2; //GetHeaderOffset(image.Width, image.Height, pixels);
+      var head0 = pixels[0, 0][0] & 1;
+      var head1 = pixels[0, 0][1] & 1;
 
-      var message = GetXCharString(length, image.Width, offset, pixels);
-      Console.WriteLine(message);
+      if (head0 == 0 && head1 == 0)
+      {
+        var length = Read16bitsAsValue(image.Width, offset, pixels);
+        Console.WriteLine($"{length}");
+
+        var message = GetXCharString(length, image.Width, offset, pixels);
+        Console.WriteLine(message);
+      }
+      else
+        if (head0 == 1 && head1 == 0)
+        {
+          var width = Read16bitsAsValue(image.Width, offset, pixels);
+          var height = Read16bitsAsValue(image.Width, offset + 16, pixels);
+          var length = width * height;
+          var hiddenImage = GetXBytes(length, image.Width, 16, pixels);
+          byte[] rgbArray = ConvertToRGB(hiddenImage);
+          Console.WriteLine($"{width} {height}");
+          File.WriteAllBytes("hiddenimage.data", rgbArray);
+        }
 
       // for (int x = 0; x < image.Width; x++)
       // {
@@ -33,6 +50,25 @@ class ConsoleApp
     }
 
 
+  }
+
+  private static byte[] ConvertToRGB(byte[] hiddenImage)
+  {
+    var result = new byte[hiddenImage.Length * 3];
+    var resultIndex = 0;
+    for (int i = 0; i < hiddenImage.Length; i++)
+    {
+      byte value = 0;
+      if (hiddenImage[i] == 1)
+      {
+        value = 255;
+      }
+      result[resultIndex] = value;
+      result[resultIndex + 1] = value;
+      result[resultIndex + 2] = value;
+      resultIndex += 3;
+    }
+    return result;
   }
 
   private static uint GetHeaderOffset(uint width, uint height, IPixelCollection<byte> pixels)
@@ -84,7 +120,18 @@ class ConsoleApp
     }
     return sb.ToString();
   }
-  private static uint GetLength(uint width, uint offset, IPixelCollection<byte> pixels)
+
+  private static byte[] GetXBytes(uint length, uint width, uint offset, IPixelCollection<byte> pixels)
+  {
+    var result = new byte[length];
+    for (int i = 0; i < length; i++)
+    {
+      var component = GetByteComponentAtIndex((uint)(offset + 18 + i), width, pixels);
+      result[i] = (byte)(component & 1);
+    }
+    return result;
+  }
+  private static uint Read16bitsAsValue(uint width, uint offset, IPixelCollection<byte> pixels)
   {
     var length = 0;
     for (int i = 0; i < 16; i++)
