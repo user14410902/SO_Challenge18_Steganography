@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Challenge18_Steganography.console/Challenge18_Steganography.console.csproj" />
+  <Project Path="Challenge18_Steganography.lib/Challenge18_Steganography.lib.csproj" />
+  <Project Path="Challenge18_Steganography.tests/Challenge18_Steganography.tests.csproj" />
+</Solution>
