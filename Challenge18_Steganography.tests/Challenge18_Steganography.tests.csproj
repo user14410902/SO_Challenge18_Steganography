@@ -24,4 +24,23 @@
     <ProjectReference Include="..\Challenge18_Steganography.lib\Challenge18_Steganography.lib.csproj" />
   </ItemGroup>
 
+
+    <ItemGroup>
+    <None Update="sample_images/1RtT7h3L.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+        <None Update="sample_images/EKD3bBZP.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+        <None Update="sample_images/bmDwolWU.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+        <None Update="sample_images/MBlXyTSp.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+        <None Update="sample_images/mCeETXDs.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>    
+  </ItemGroup>
+
 </Project>
